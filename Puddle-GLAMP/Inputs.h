@@ -15,10 +15,6 @@ void KeyboardDepressed(unsigned char key, int x, int y) {
 	if (key == 'a') camMove.x -= camMoveStep;
 	if (key == 'd') camMove.x += camMoveStep;
 
-	if (key == 'p') { *doGameTicks = !*doGameTicks; }
-
-	if (key == 'r') { _automota->InitGrid(); }
-
 	if (key == 'q') exit(0);
 
 	_input_cam_ref->MoveCamera(camMove);

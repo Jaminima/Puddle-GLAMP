@@ -4,11 +4,7 @@
 #include "Camera.h"
 #include "Consts.h"
 
-#include <amp.h>
-#include <amp_math.h>
 #include <iostream>
-using namespace concurrency;
-using namespace fast_math;
 
 Camera* camera;
 Color* Frame;

@@ -79,18 +79,18 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\packages\freeglut.2.8.1.15\build\native\lib\v110\x64\Debug\dynamic\freeglut.lib">
+    <Library Include="..\packages\freeglut.2.8.1.15\build\native\lib\v110\x64\Release\dynamic\freeglut.lib">
       <Filter>Resource Files</Filter>
     </Library>
-    <Library Include="..\packages\freeglut.2.8.1.15\build\native\lib\v110\x64\Debug\ltcg\freeglut.lib">
+    <Library Include="..\packages\freeglut.2.8.1.15\build\native\lib\v110\x64\Release\ltcg\freeglut.lib">
       <Filter>Resource Files</Filter>
     </Library>
-    <Library Include="..\packages\freeglut.2.8.1.15\build\native\lib\v110\x64\Debug\static\freeglut.lib">
+    <Library Include="..\packages\freeglut.2.8.1.15\build\native\lib\v110\x64\Release\static\freeglut.lib">
       <Filter>Resource Files</Filter>
     </Library>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="..\packages\freeglut.redist.2.8.1.15\build\native\bin\v110\x64\Debug\dynamic\freeglut.dll">
+    <CopyFileToFolders Include="..\packages\freeglut.redist.2.8.1.15\build\native\bin\v110\x64\Release\dynamic\freeglut.dll">
       <Filter>Resource Files</Filter>
     </CopyFileToFolders>
   </ItemGroup>
