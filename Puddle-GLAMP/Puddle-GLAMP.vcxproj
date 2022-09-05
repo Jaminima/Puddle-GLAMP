@@ -140,6 +140,17 @@
     <ClInclude Include="..\packages\freeglut.2.8.1.15\build\native\include\GL\freeglut_ext.h" />
     <ClInclude Include="..\packages\freeglut.2.8.1.15\build\native\include\GL\freeglut_std.h" />
     <ClInclude Include="..\packages\freeglut.2.8.1.15\build\native\include\GL\glut.h" />
+    <ClInclude Include="App.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Cell.h" />
+    <ClInclude Include="Color.h" />
+    <ClInclude Include="Consts.h" />
+    <ClInclude Include="Frame.h" />
+    <ClInclude Include="Inputs.h" />
+    <ClInclude Include="Tick.h" />
+    <ClInclude Include="vec3.h" />
+    <ClInclude Include="Window.h" />
+    <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\packages\freeglut.2.8.1.15\build\native\lib\v110\x64\Debug\dynamic\freeglut.lib" />
