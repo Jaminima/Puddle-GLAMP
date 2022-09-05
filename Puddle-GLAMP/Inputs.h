@@ -25,5 +25,5 @@ void MouseMove(int x, int y) {
 
 	_input_cam_ref->RotateCamera(Vec3(movey * camSensitvity, -movex * camSensitvity, 0));
 
-	glutWarpPointer(w_half, h_half);
+	//glutWarpPointer(w_half, h_half);
 }

@@ -18,6 +18,16 @@ void Setup(Camera* _camera) {
 
 	camera->Position = Vec3(5, 5, 5);
 	Frame = new Color[w * h];
+
+	for (int x = 0, y = 0; y < h;) {
+		Frame[(y * w) + x] = Color(128, 128, 128);
+
+		x++;
+		if (x == w) {
+			x = 0;
+			y++;
+		}
+	}
 }
 
 struct Hit {
