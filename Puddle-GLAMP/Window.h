@@ -15,7 +15,7 @@ Camera* _camera = new Camera();
 
 void drawFrame()
 {
-	glDrawPixels(w, h, GL_RGBA, GL_UNSIGNED_INT, Frame);
+	glDrawPixels(w, h, GL_RGBA, GL_UNSIGNED_BYTE, Frame);
 	glutSwapBuffers();
 }
 

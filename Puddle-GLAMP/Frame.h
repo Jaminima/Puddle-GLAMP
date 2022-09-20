@@ -20,7 +20,7 @@ void Setup(Camera* _camera) {
 	Frame = new Color[w * h];
 
 	for (int x = 0, y = 0; y < h;) {
-		Frame[(y * w) + x] = Color(128, 128, 128);
+		Frame[(y * w) + x] = Color();
 
 		x++;
 		if (x == w) {
