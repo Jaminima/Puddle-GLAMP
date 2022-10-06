@@ -10,16 +10,16 @@ class Color
 public:
 	unsigned int RGBA;
 
-	unsigned int GetR() restrict(amp, cpu) {
+	unsigned int GetA() restrict(amp, cpu) {
 		return (RGBA & 0xFF000000) >> 24;
 	}
-	unsigned int GetG() restrict(amp, cpu) {
+	unsigned int GetB() restrict(amp, cpu) {
 		return (RGBA & 0x00FF0000) >> 16;
 	}
-	unsigned int GetB() restrict(amp, cpu) {
+	unsigned int GetG() restrict(amp, cpu) {
 		return (RGBA & 0x0000FF00) >> 8;
 	}
-	unsigned int GetA() restrict(amp, cpu) {
+	unsigned int GetR() restrict(amp, cpu) {
 		return (RGBA & 0x000000FF);
 	}
 
@@ -35,11 +35,11 @@ public:
 
 	void operator/=(float V) restrict(amp, cpu)
 	{
-		unsigned int R = (unsigned int)ceilf(R / V);
-		unsigned int G = (unsigned int)ceilf(G / V);
-		unsigned int B = (unsigned int)ceilf(B / V);
+		unsigned int R = (unsigned int)ceilf(GetR() / V);
+		unsigned int G = (unsigned int)ceilf(GetG() / V);
+		unsigned int B = (unsigned int)ceilf(GetB() / V);
 
-		RGBA = ((R & 0xFF) << 24) + ((G & 0xFF) << 16) + ((B & 0xFF) << 8) + 0xFF;
+		SetColor(R, G, B);
 	}
 
 	void operator+=(Color V) restrict(amp, cpu)
@@ -48,11 +48,16 @@ public:
 		unsigned int G = GetG() + V.GetG();
 		unsigned int B = GetB() + V.GetB();
 
-		RGBA = ((R & 0xFF) << 24) + ((G & 0xFF) << 16) + ((B & 0xFF) << 8) + 0xFF;
+		SetColor(R, G, B);
 	}
 
 	Color(unsigned int R, unsigned int G, unsigned int B) restrict(amp, cpu) {
-		RGBA = ((R & 0xFF) << 24) + ((G & 0xFF) << 16) + ((B & 0xFF) << 8) + 0xFF;
+		//RGBA = ((R & 0xFF) << 24) + ((G & 0xFF) << 16) + ((B & 0xFF) << 8) + 0xFF;
+		SetColor(R, G, B);
+	}
+
+	void SetColor(unsigned int R, unsigned int G, unsigned int B) restrict(amp, cpu) {
+		RGBA = ((B & 0xFF) << 16) + ((G & 0xFF) << 8) + ((R & 0xFF) << 0) + 0xFF000000;
 	}
 
 	bool IsBlack() restrict(amp, cpu) {

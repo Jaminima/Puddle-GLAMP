@@ -147,6 +147,7 @@
     <ClInclude Include="Consts.h" />
     <ClInclude Include="Frame.h" />
     <ClInclude Include="Inputs.h" />
+    <ClInclude Include="Lock.h" />
     <ClInclude Include="Tick.h" />
     <ClInclude Include="vec3.h" />
     <ClInclude Include="Window.h" />
