@@ -20,12 +20,22 @@ completion_future* DoTick() {
 		_frame.extent,
 		[=](index<2> idx) restrict(amp) {
 			index<3> widx(0,idx[0], idx[1]);
-			Cell c = _worldGrid[widx];
+			Cell cc = _worldGrid[widx];
 
-			Color col(c.f * 255, c.f * 255, c.f * 255);
+			Cell cu = _worldGrid[widx - wz];
+			Cell cd = _worldGrid[widx + wz];
+			Cell cl = _worldGrid[widx - 1];
+			Cell cr = _worldGrid[widx + 1];
+
+			float avg = ((cc.f * 4) + cu.f + cd.f + cl.f + cr.f)/8;
+
+			Color col(avg * 255, avg * 255, avg * 255);
 			//Color col(widx[0] * 255, widx[1] * 255, widx[2] * 255);
 
-			_worldGrid[widx].f =  0.8f;
+			//if (idx[0] == 255 && idx[1] == 255) {
+			//	//col = Color(255, 255, 255);
+			//}
+
 			_frame[idx] = col;
 		}
 	);
