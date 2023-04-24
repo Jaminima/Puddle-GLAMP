@@ -38,6 +38,8 @@ void triggerReDraw()
 	simStep[0].wait();
 	simStep[1].wait();
 
+	delete[] simStep;
+
 	glutPostRedisplay();
 }
 

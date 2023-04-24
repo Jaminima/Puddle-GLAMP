@@ -22,12 +22,10 @@ completion_future* DoTick() {
 			index<3> widx(0,idx[0], idx[1]);
 			Cell c = _worldGrid[widx];
 
-			//Color col(c.f * 255, c.f * 255, c.f * 255);
-			Color col(widx[0] * 255, widx[1] * 255, widx[2] * 255);
+			Color col(c.f * 255, c.f * 255, c.f * 255);
+			//Color col(widx[0] * 255, widx[1] * 255, widx[2] * 255);
 
-			c.f = max(1.0f / (idx[0] + (idx[1] * wy)),0.5f);
-
-			_worldGrid[widx] = c;
+			_worldGrid[widx].f =  0.8f;
 			_frame[idx] = col;
 		}
 	);
@@ -46,5 +44,10 @@ completion_future* DoTick() {
 
 	step++;
 
-	return new completion_future[2] {_frame.synchronize_async(access_type_read_write), _worldGrid.synchronize_async(access_type_write)};
+	completion_future* fin = new completion_future[2];
+
+	fin[0] = _frame.synchronize_async(access_type_read_write);
+	fin[1] = _worldGrid.synchronize_async(access_type_read_write);
+
+	return fin;
 }
