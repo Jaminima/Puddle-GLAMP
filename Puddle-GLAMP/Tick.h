@@ -6,7 +6,7 @@
 
 unsigned int step = 0;
 
-completion_future DoTick() {
+completion_future* DoTick() {
 	const unsigned int wx = world_x;
 	const unsigned int wy = world_y;
 	const unsigned int wz = world_z;
@@ -17,22 +17,18 @@ completion_future DoTick() {
 	array_view<Lock, 2> _frameLock(w, h, frameLock);
 
 	parallel_for_each(
-		_worldGrid.extent,
-		[=](index<3> idx) restrict(amp) {
-			index<2> frameIdx((idx[0]+idx[2] - _step / (float)wx) * w / 8, (idx[1]-idx[2]+_step / (float)wy) * h / 8);
+		_frame.extent,
+		[=](index<2> idx) restrict(amp) {
+			index<3> widx(0,idx[0], idx[1]);
+			Cell c = _worldGrid[widx];
 
-			if (_frameLock[frameIdx].Grant()) {
-				//_frame[frameIdx].SetColor(255, 255, 255);
-				_frame[frameIdx] += Color(50, 50, 50);
-			}
-			else {
-				int i = 255;
-				while (!_frameLock[frameIdx].Grant()) {
-					i++;
-				}
-				_frame[frameIdx].SetColor(255, 0, 0);
-			}
-			_frameLock[frameIdx].Free();
+			//Color col(c.f * 255, c.f * 255, c.f * 255);
+			Color col(widx[0] * 255, widx[1] * 255, widx[2] * 255);
+
+			c.f = max(1.0f / (idx[0] + (idx[1] * wy)),0.5f);
+
+			_worldGrid[widx] = c;
+			_frame[idx] = col;
 		}
 	);
 
@@ -50,5 +46,5 @@ completion_future DoTick() {
 
 	step++;
 
-	return _frame.synchronize_async(access_type_read_write);
+	return new completion_future[2] {_frame.synchronize_async(access_type_read_write), _worldGrid.synchronize_async(access_type_write)};
 }

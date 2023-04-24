@@ -19,7 +19,7 @@ void drawFrame()
 	glutSwapBuffers();
 }
 
-completion_future simStep;
+completion_future* simStep;
 
 void triggerReDraw()
 {
@@ -35,7 +35,8 @@ void triggerReDraw()
 		fpsTime = clock();
 	}
 
-	simStep.wait();
+	simStep[0].wait();
+	simStep[1].wait();
 
 	glutPostRedisplay();
 }
