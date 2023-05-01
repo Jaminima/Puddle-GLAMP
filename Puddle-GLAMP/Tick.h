@@ -6,10 +6,15 @@
 
 unsigned int step = 0;
 
+bool inWorldRange(unsigned int idx, unsigned int world_cells) restrict(amp,cpu) {
+	return idx < world_cells && idx >= 0;
+}
+
 completion_future* DoTick() {
 	const unsigned int wx = world_x;
 	const unsigned int wy = world_y;
 	const unsigned int wz = world_z;
+	const unsigned int wc = world_cells;
 
 	const unsigned int _step = step;
 	array_view<Cell, 3> _worldGrid(wx, wy, wz, world);
