@@ -9,7 +9,7 @@ float* sim_c;
 float* sim_cu;
 float* sim_feq;
 
-unsigned int world_x = 512, world_y = 512;
+unsigned int world_x = 128, world_y = 128;
 unsigned int world_cells = world_x * world_y;
 float defaultValue = 0;
 
