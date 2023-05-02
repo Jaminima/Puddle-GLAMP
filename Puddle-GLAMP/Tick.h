@@ -9,76 +9,6 @@ bool inWorldRange(unsigned int idx, unsigned int world_cells) restrict(amp,cpu) 
 	return idx < world_cells && idx >= 0;
 }
 
-void ComputeFeq(array_view<Cell, 2> _u,
-				array_view<float, 1> _w,
-				array_view<float, 1> _c,
-				array_view<float, 1> _cu,
-				array_view<float, 1> _cu2,
-				array_view<float, 3> _feq) {
-
-	const unsigned int wx = world_x;
-	const unsigned int wy = world_y;
-
-	//Calculate CU
-	parallel_for_each(
-		_cu.extent / 2,
-		[=](index<1> idx) restrict(amp) {
-			idx *= 2;
-
-	for (int x = 0; x < wx; x++) {
-		for (int y = 0; y < wy; y++) {
-			Cell cc = _u[index<2>(x, y)];
-
-			_cu[idx] = _c[idx] * cc.x;
-			_cu[idx + 1] = _c[idx + 1] * cc.y;
-
-			_cu2[idx] = _cu[idx] * _cu[idx];
-			_cu2[idx + 1] = _cu[idx + 1] * _cu[idx + 1];
-		}
-	}
-		}
-	);
-
-	//cu.synchronize();
-
-	//Calculate usq
-	parallel_for_each(
-		_u.extent,
-		[=](index<2> idx) restrict(amp) {
-			Cell cc = _u[idx];
-
-	_u[idx].sim_usq = powf(cc.x, 2) + powf(cc.y, 2);
-		}
-	);
-
-	//_u.synchronize();
-
-	//Calculate feq
-	parallel_for_each(
-		_feq.extent,
-		[=](index<3> idx) restrict(amp) {
-			index<2> widx(idx[1], idx[2]);
-
-	_feq[idx] = _u[widx].rho * _w[idx[0]] * (1.0f + (3.0f * _cu[idx[0]]) + (4.5f * _cu2[idx[0]]) - (1.5f * _u[widx].sim_usq));
-		}
-	);
-
-	//_feq.synchronize();
-}
-
-void ComputeCollision(array_view<float, 3> _feq, float omega) {
-
-	parallel_for_each(
-		_feq.extent,
-		[=](index<3> idx) restrict(amp) {
-			float f = _feq[idx];
-
-			_fex[idx] += -omega * ()
-			
-		}
-	);
-}
-
 completion_future* DoTick() {
 	const unsigned int wx = world_x;
 	const unsigned int wy = world_y;
@@ -98,9 +28,7 @@ completion_future* DoTick() {
 	array_view<float, 1> _cu2(18, sim_cu);
 	array_view<float, 3> _feq(9, wx, wy, sim_feq);
 
-	ComputeFeq(_u,_w, _c, _cu, _cu2, _feq);
-
-	ComputeCollision(_feq, omega);
+	
 
 	step++;
 
