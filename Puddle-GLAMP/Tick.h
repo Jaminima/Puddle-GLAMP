@@ -66,6 +66,19 @@ void ComputeFeq(array_view<Cell, 2> _u,
 	//_feq.synchronize();
 }
 
+void ComputeCollision(array_view<float, 3> _feq, float omega) {
+
+	parallel_for_each(
+		_feq.extent,
+		[=](index<3> idx) restrict(amp) {
+			float f = _feq[idx];
+
+			_fex[idx] += -omega * ()
+			
+		}
+	);
+}
+
 completion_future* DoTick() {
 	const unsigned int wx = world_x;
 	const unsigned int wy = world_y;
@@ -86,6 +99,8 @@ completion_future* DoTick() {
 	array_view<float, 3> _feq(9, wx, wy, sim_feq);
 
 	ComputeFeq(_u,_w, _c, _cu, _cu2, _feq);
+
+	ComputeCollision(_feq, omega);
 
 	step++;
 
