@@ -25,6 +25,7 @@ completion_future* DoTick() {
 	array_view<float, 1> _w(9, sim_w);
 	array_view<float, 1> _c(18, sim_c);
 	array_view<float, 1> _cu(18, sim_cu);
+	array_view<float, 1> _cu2(18, sim_cu);
 	array_view<float, 3> _feq(9, wx, wy, sim_feq);
 
 	//Calculate CU
@@ -39,6 +40,9 @@ completion_future* DoTick() {
 
 					_cu[idx] = _c[idx] * cc.x;
 					_cu[idx + 1] = _c[idx + 1] * cc.y;
+
+					_cu2[idx] = _cu[idx] * _cu[idx];
+					_cu2[idx + 1] = _cu[idx + 1] * _cu[idx + 1];
 				}
 			}
 		}
@@ -64,9 +68,11 @@ completion_future* DoTick() {
 		[=](index<3> idx) restrict(amp) {
 			index<2> widx(idx[1], idx[2]);
 
-	_feq[idx] = _u[widx].rho * _w[idx[0]] * (1.0f + (3.0f * _cu[idx[0]]) + (4.5f *))
+			_feq[idx] = _u[widx].rho * _w[idx[0]] * (1.0f + (3.0f * _cu[idx[0]]) + (4.5f * _cu2[idx[0]]) - (1.5f * _u[widx].sim_usq));
 		}
 	);
+
+	_feq.synchronize();
 
 		/*double feq[9][nx][ny];
 			for (int i = 0; i < 9; i++) {
