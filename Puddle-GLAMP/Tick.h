@@ -33,6 +33,24 @@ bool inWorldRange(unsigned int idx, unsigned int world_cells) restrict(amp,cpu) 
 	return idx < world_cells && idx >= 0;
 }
 
+void SetObstruction(index<2> tl, index<2> br, array_view<float, 3> _F) {
+	parallel_for_each(extent<2>(br[0] - tl[0], br[1] - tl[1]),
+		[=](index<2> idx) restrict(amp) {
+			index<3> _FIdx(idx[0] + tl[0], idx[1] + tl[1], 0);
+
+			_F[_FIdx] = 0;
+			_F[_FIdx+1] = 5;
+			_F[_FIdx+2] = 6;
+			_F[_FIdx+3] = 7;
+			_F[_FIdx+4] = 8;
+			_F[_FIdx+5] = 1;
+			_F[_FIdx+6] = 2;
+			_F[_FIdx+7] = 3;
+			_F[_FIdx+8] = 4;
+		}
+	);
+}
+
 #define futures_returned 3
 
 completion_future* DoTick() {
@@ -56,6 +74,8 @@ completion_future* DoTick() {
 	array_view<float, 3> _NF(wx, wy, NL, F);
 
 	array_view<float, 3> _Feq(wx, wy, NL);
+
+	SetObstruction(index<2>(wx / 2 - 20, wy / 2 - 20), index<2>(wx / 2 + 20, wy / 2 + 20), _F);
 
 	//Apply Drift
 	parallel_for_each(_F.extent,
@@ -119,7 +139,7 @@ completion_future* DoTick() {
 		[=](index<2>idx) restrict(amp) {
 			Cell u = _XY[idx];
 
-			_frame[idx].SetColor(u.x * 255, 0, u.y * 255);
+			_frame[idx].SetColor(u.x * 255, u.rho * 255, u.y * 255);
 		}
 	);
 
