@@ -45,7 +45,7 @@ completion_future* DoTick() {
 
 	//Shared
 	array_view<float, 1> _cxsy(18, cxsy);
-	array_view<float, 1> _weights(9, weights);
+	array_view<float, 1> _W(9, weights);
 	array_view<float, 3> _F(wx, wy, NL, F);
 	array_view<float, 3> _NF(wx, wy, NL, F);
 
@@ -91,6 +91,26 @@ completion_future* DoTick() {
 	);
 
 	fin[1] = _XY.synchronize_async(access_type_read_write);
+
+	//Apply Collision
+	parallel_for_each(_Feq.extent,
+		[=](index<3> idx)restrict(amp) {
+			index<2> widx(idx[0], idx[1]);
+			Cell u = _XY[widx];
+			
+			float v = u.rho * _W[idx[2]];
+			float cx = _cxsy[idx[2]];
+			float cy = _cxsy[idx[2] + NL];
+
+			float cxuxcyuy = cx * u.x + cy * u.y;
+
+			float vb = (1 + 3 * cxuxcyuy + 9 * cxuxcyuy * cxuxcyuy / 2 - 3 * (u.x * u.x + u.y * u.y) / 2);
+
+			v *= vb;
+
+			_Feq[idx] = v;
+		}
+	);
 
 	step++;
 
