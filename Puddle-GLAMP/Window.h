@@ -35,8 +35,10 @@ void triggerReDraw()
 		fpsTime = clock();
 	}
 
-	simStep[0].wait();
-	simStep[1].wait();
+	for (int i = 0; i < futures_returned; i++) {
+		simStep[i].wait();
+
+	}
 
 	delete[] simStep;
 

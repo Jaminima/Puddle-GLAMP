@@ -15,15 +15,22 @@ void InitTick() {
 
 	weights = new float[] {4 / 9, 1 / 9, 1 / 36, 1 / 9, 1 / 36, 1 / 9, 1 / 36, 1 / 9, 1 / 36};
 
-	F = new float[world_x * world_y * NL]{ 1.0f };
+	int dim = world_x * world_y * NL;
+	F = new float[dim];
+
+	for (int i = 0; i < dim; i++) {
+		F[i] = 1.0f;
+	}
 }
 
 bool inWorldRange(unsigned int idx, unsigned int world_cells) restrict(amp,cpu) {
 	return idx < world_cells && idx >= 0;
 }
 
+#define futures_returned 3
+
 completion_future* DoTick() {
-	completion_future* fin = new completion_future[5];
+	completion_future* fin = new completion_future[futures_returned];
 
 	//NX, NY
 	const unsigned int wx = world_x;
@@ -44,15 +51,18 @@ completion_future* DoTick() {
 
 	array_view<float, 3> _Feq(wx, wy, NL);
 
+	for (int i = 0; i < NL * 2;i++) {
+		_NF[index<3>(256,256,i)] += 0.8;
+	}
+
 	//Apply Drift
 	parallel_for_each(_F.extent,
 		[=](index<3> idx) restrict(amp) {
 			float v = _F[idx];
 
-			idx[0] += _cxsy[idx[2]];
-			idx[1] += _cxsy[idx[2] + NL];
+			index<3> nidx(idx[0] + _cxsy[idx[2]], idx[1] + _cxsy[idx[2]+ NL], idx[2]);
 
-			_NF[idx] = v;
+			_NF[nidx] = v;
 		}
 	);
 
@@ -75,6 +85,8 @@ completion_future* DoTick() {
 			_XY[idx].rho = rho;
 			_XY[idx].x = ux;
 			_XY[idx].y = uy;
+
+			_frame[idx].SetColor(ux * 255, uy*255,(ux+uy)*127);
 		}
 	);
 
@@ -82,7 +94,7 @@ completion_future* DoTick() {
 
 	step++;
 
-	fin[4] = _frame.synchronize_async(access_type_read_write);
+	fin[2] = _frame.synchronize_async(access_type_read_write);
 
 	return fin;
 }
