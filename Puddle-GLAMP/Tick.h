@@ -25,11 +25,7 @@ void InitTick() {
 
 	for (int i = 0; i < F_Dim; i++) {
 		//F[i] = rand() / 10.0f;
-		F[i] = 2.0f + (0.01f * (rand() / 100.0f));
-
-		if (i % 9 < 3) {
-			F[i] += 2;
-		}
+		F[i] = (rand() % 100)/100.0f;
 	}
 }
 
