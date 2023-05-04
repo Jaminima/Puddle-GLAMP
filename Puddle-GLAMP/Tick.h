@@ -2,24 +2,34 @@
 #include <amp.h>
 
 #include "World.h"
+#include <stdlib.h> 
 
 unsigned int step = 0;
 
 //Lattice Speed
 #define NL 9
+#define tau 0.6
 
 float *cxsy, *weights, *F;
+
+unsigned int F_Dim = world_x * world_y * NL;
 
 void InitTick() {
 	cxsy = new float[18]{ 0, 0, 1, 1, 1, 0,-1,-1,-1 , 0, 1, 1, 0,-1,-1,-1, 0, 1 };
 
 	weights = new float[] {4 / 9, 1 / 9, 1 / 36, 1 / 9, 1 / 36, 1 / 9, 1 / 36, 1 / 9, 1 / 36};
 
-	int dim = world_x * world_y * NL;
-	F = new float[dim];
+	F = new float[F_Dim];
 
-	for (int i = 0; i < dim; i++) {
-		F[i] = 1.0f;
+	srand(time(NULL));
+
+	for (int i = 0; i < F_Dim; i++) {
+		//F[i] = rand() / 10.0f;
+		F[i] = 2.0f + (0.01f * (rand() / 100.0f));
+
+		if (i % 9 < 3) {
+			F[i] += 2;
+		}
 	}
 }
 
@@ -51,10 +61,6 @@ completion_future* DoTick() {
 
 	array_view<float, 3> _Feq(wx, wy, NL);
 
-	for (int i = 0; i < NL * 2;i++) {
-		_NF[index<3>(256,256,i)] += 0.8;
-	}
-
 	//Apply Drift
 	parallel_for_each(_F.extent,
 		[=](index<3> idx) restrict(amp) {
@@ -66,8 +72,8 @@ completion_future* DoTick() {
 		}
 	);
 
-	fin[0] = _NF.synchronize_async(access_type_read_write);
 
+	//Fluid Variables
 	parallel_for_each(_XY.extent,
 		[=](index<2> idx) restrict(amp) {
 			float rho = 0;
@@ -86,11 +92,9 @@ completion_future* DoTick() {
 			_XY[idx].x = ux;
 			_XY[idx].y = uy;
 
-			_frame[idx].SetColor(ux * 255, uy*255,(ux+uy)*127);
+			float sum = ux + uy;
 		}
 	);
-
-	fin[1] = _XY.synchronize_async(access_type_read_write);
 
 	//Apply Collision
 	parallel_for_each(_Feq.extent,
@@ -109,10 +113,25 @@ completion_future* DoTick() {
 			v *= vb;
 
 			_Feq[idx] = v;
+
+			_NF[idx] += -(1.0f / tau) * (_NF[idx] - v);
+		}
+	);
+
+	//Frame
+	parallel_for_each(_frame.extent,
+		[=](index<2>idx) restrict(amp) {
+			Cell u = _XY[idx];
+
+			_frame[idx].SetColor(u.x * 255, 0, u.y * 255);
 		}
 	);
 
 	step++;
+
+	fin[0] = _NF.synchronize_async(access_type_read_write);
+
+	fin[1] = _XY.synchronize_async(access_type_read_write);
 
 	fin[2] = _frame.synchronize_async(access_type_read_write);
 

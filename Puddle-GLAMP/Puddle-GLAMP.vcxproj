@@ -134,7 +134,6 @@
     <CopyFileToFolders Include="..\packages\freeglut.redist.2.8.1.15\build\native\bin\v110\x64\Release\dynamic\freeglut.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
-    <None Include="c.py" />
     <None Include="c2.py" />
     <None Include="packages.config" />
   </ItemGroup>
