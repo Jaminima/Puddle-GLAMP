@@ -37,7 +37,6 @@ void triggerReDraw()
 
 	for (int i = 0; i < futures_returned; i++) {
 		simStep[i].wait();
-
 	}
 
 	delete[] simStep;

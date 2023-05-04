@@ -8,8 +8,6 @@ public:
 
 	float sim_usq = 0;
 
-
 	Cell() restrict(amp, cpu) {
-
 	}
 };

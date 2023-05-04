@@ -2,7 +2,7 @@
 #include <amp.h>
 
 #include "World.h"
-#include <stdlib.h> 
+#include <stdlib.h>
 
 unsigned int step = 0;
 
@@ -10,12 +10,12 @@ unsigned int step = 0;
 #define NL 9
 #define tau 0.6
 
-float *cxsy, *weights, *F;
+float* cxsy, * weights, * F;
 
 unsigned int F_Dim = world_x * world_y * NL;
 
 void InitTick() {
-	cxsy = new float[18]{ 0, 0, 1, 1, 1, 0,-1,-1,-1 , 0, 1, 1, 0,-1,-1,-1, 0, 1 };
+	cxsy = new float[18] { 0, 0, 1, 1, 1, 0, -1, -1, -1, 0, 1, 1, 0, -1, -1, -1, 0, 1 };
 
 	weights = new float[] {4 / 9, 1 / 9, 1 / 36, 1 / 9, 1 / 36, 1 / 9, 1 / 36, 1 / 9, 1 / 36};
 
@@ -25,12 +25,12 @@ void InitTick() {
 
 	for (int i = 0; i < F_Dim; i++) {
 		//F[i] = rand() / 10.0f;
-		F[i] = (rand() % 100)/100.0f;
+		F[i] = (rand() % 100) / 100.0f;
 	}
 }
 
-bool inWorldRange(unsigned int idx, unsigned int world_cells) restrict(amp,cpu) {
-	return idx < world_cells && idx >= 0;
+bool inWorldRange(unsigned int idx, unsigned int world_cells) restrict(amp, cpu) {
+	return idx < world_cells&& idx >= 0;
 }
 
 void SetObstruction(index<2> tl, index<2> br, array_view<float, 3> _F) {
@@ -38,15 +38,15 @@ void SetObstruction(index<2> tl, index<2> br, array_view<float, 3> _F) {
 		[=](index<2> idx) restrict(amp) {
 			index<3> _FIdx(idx[0] + tl[0], idx[1] + tl[1], 0);
 
-			_F[_FIdx] = 0;
-			_F[_FIdx+1] = 5;
-			_F[_FIdx+2] = 6;
-			_F[_FIdx+3] = 7;
-			_F[_FIdx+4] = 8;
-			_F[_FIdx+5] = 1;
-			_F[_FIdx+6] = 2;
-			_F[_FIdx+7] = 3;
-			_F[_FIdx+8] = 4;
+	_F[_FIdx] = 0;
+	_F[_FIdx + 1] = 5;
+	_F[_FIdx + 2] = 6;
+	_F[_FIdx + 3] = 7;
+	_F[_FIdx + 4] = 8;
+	_F[_FIdx + 5] = 1;
+	_F[_FIdx + 6] = 2;
+	_F[_FIdx + 7] = 3;
+	_F[_FIdx + 8] = 4;
 		}
 	);
 }
@@ -82,33 +82,32 @@ completion_future* DoTick() {
 		[=](index<3> idx) restrict(amp) {
 			float v = _F[idx];
 
-			index<3> nidx(idx[0] + _cxsy[idx[2]], idx[1] + _cxsy[idx[2]+ NL], idx[2]);
+	index<3> nidx(idx[0] + _cxsy[idx[2]], idx[1] + _cxsy[idx[2] + NL], idx[2]);
 
-			_NF[nidx] = v;
+	_NF[nidx] = v;
 		}
 	);
-
 
 	//Fluid Variables
 	parallel_for_each(_XY.extent,
 		[=](index<2> idx) restrict(amp) {
 			float rho = 0;
-			float ux = 0;
-			float uy = 0;
+	float ux = 0;
+	float uy = 0;
 
-			for (int i = 0; i < NL; i++) {
-				index<3> _FIdx(idx[0], idx[1], i);
+	for (int i = 0; i < NL; i++) {
+		index<3> _FIdx(idx[0], idx[1], i);
 
-				rho += _NF[_FIdx];
-				ux += _NF[_FIdx] * _cxsy[i];
-				uy += _NF[_FIdx] * _cxsy[i + 8];
-			}
+		rho += _NF[_FIdx];
+		ux += _NF[_FIdx] * _cxsy[i];
+		uy += _NF[_FIdx] * _cxsy[i + 8];
+	}
 
-			_XY[idx].rho = rho;
-			_XY[idx].x = ux;
-			_XY[idx].y = uy;
+	_XY[idx].rho = rho;
+	_XY[idx].x = ux;
+	_XY[idx].y = uy;
 
-			float sum = ux + uy;
+	float sum = ux + uy;
 		}
 	);
 
@@ -116,21 +115,21 @@ completion_future* DoTick() {
 	parallel_for_each(_Feq.extent,
 		[=](index<3> idx)restrict(amp) {
 			index<2> widx(idx[0], idx[1]);
-			Cell u = _XY[widx];
-			
-			float v = u.rho * _W[idx[2]];
-			float cx = _cxsy[idx[2]];
-			float cy = _cxsy[idx[2] + NL];
+	Cell u = _XY[widx];
 
-			float cxuxcyuy = cx * u.x + cy * u.y;
+	float v = u.rho * _W[idx[2]];
+	float cx = _cxsy[idx[2]];
+	float cy = _cxsy[idx[2] + NL];
 
-			float vb = (1 + 3 * cxuxcyuy + 9 * cxuxcyuy * cxuxcyuy / 2 - 3 * (u.x * u.x + u.y * u.y) / 2);
+	float cxuxcyuy = cx * u.x + cy * u.y;
 
-			v *= vb;
+	float vb = (1 + 3 * cxuxcyuy + 9 * cxuxcyuy * cxuxcyuy / 2 - 3 * (u.x * u.x + u.y * u.y) / 2);
 
-			_Feq[idx] = v;
+	v *= vb;
 
-			_NF[idx] += -(1.0f / tau) * (_NF[idx] - v);
+	_Feq[idx] = v;
+
+	_NF[idx] += -(1.0f / tau) * (_NF[idx] - v);
 		}
 	);
 
@@ -139,7 +138,7 @@ completion_future* DoTick() {
 		[=](index<2>idx) restrict(amp) {
 			Cell u = _XY[idx];
 
-			_frame[idx].SetColor(u.x * 255, u.rho * 255, u.y * 255);
+	_frame[idx].SetColor(u.x * 255, u.rho * 255, u.y * 255);
 		}
 	);
 

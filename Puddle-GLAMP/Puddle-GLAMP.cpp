@@ -13,8 +13,8 @@ bool pick_accelerator()
 		[](const accelerator& acc)
 		{
 			return !acc.is_emulated &&
-				acc.supports_double_precision &&
-				!acc.has_display;
+			acc.supports_double_precision &&
+		!acc.has_display;
 		});
 
 	if (result != accs.end())
