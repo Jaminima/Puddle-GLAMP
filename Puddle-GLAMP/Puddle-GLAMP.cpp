@@ -33,6 +33,7 @@ int main(int argc, char** argv)
 	pick_accelerator();
 
 	InitWorld();
+	InitTick();
 	SetupFrame(argc, argv);
 
 	while (true) {}

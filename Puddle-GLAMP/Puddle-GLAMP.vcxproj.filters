@@ -30,6 +30,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="c.py">
+      <Filter>Header Files\Simulation</Filter>
+    </None>
+    <None Include="c2.py">
+      <Filter>Header Files\Simulation</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\packages\freeglut.2.8.1.15\build\native\include\GL\freeglut.h">
