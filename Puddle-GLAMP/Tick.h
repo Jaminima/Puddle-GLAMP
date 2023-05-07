@@ -11,9 +11,15 @@ unsigned int step = 0;
 #define tau 0.6
 #define rho0 100
 
+#define scaledrndres 10000
+
 float* cxsy, * weights, * F;
 
 unsigned int F_Dim = world_x * world_y * NL;
+
+float scaledrnd() {
+	return rand() % scaledrndres / (float)scaledrndres;
+}
 
 void InitTick() {
 	cxsy = new float[NL + NL] { 0, 0, 1, 1, 1, 0, -1, -1, -1, 0, 1, 1, 0, -1, -1, -1, 0, 1 };
@@ -37,10 +43,11 @@ void InitTick() {
 		float rho = 0;
 
 		for (int j = 0; j < NL; j++) {
-			float v = 1 + (rand() % 100) / 1000.0f;
+			float v = 1 + 0.01 * scaledrnd();
 
 			if (j == 3) {
-				F[i] += 2 * (1+0.2 * cosf(2*3.14159*i));
+				//v += 2 * (1+0.2 * cosf(2*3.14159*i/world_x*4));
+				v += 2 * (1 + 0.2 * cosf(i / world_x * 4));
 			}
 
 			rho += v;
@@ -75,7 +82,7 @@ void SetRectangleObstruction(index<2> tl, index<2> br, array_view<float, 3> _F) 
 	);
 }
 
-void SetCircleObstruction(index<2> center, unsigned int r, array_view<float, 3> _F) {
+void SetCircleObstruction(index<2> center, unsigned int r, array_view<float, 3> _F, array_view<Cell, 2> _XY) {
 	//Not Quite A Circle
 	index<2> tl(center[0], center[1]);
 	unsigned int rr = r * r;
@@ -94,6 +101,8 @@ void SetCircleObstruction(index<2> center, unsigned int r, array_view<float, 3> 
 				_F[_FIdx + 6] = 2;
 				_F[_FIdx + 7] = 3;
 				_F[_FIdx + 8] = 4;
+
+				_XY[idx[0] + tl[0]][idx[1] + tl[1]].isSolid = true;
 			}
 		}
 	);
@@ -180,14 +189,27 @@ completion_future* DoTick() {
 	);
 
 	//SetRectangleObstruction(index<2>(wx / 2 - 20, wy / 2 - 20), index<2>(wx / 2 + 20, wy / 2 + 20), _NF);
-	SetCircleObstruction(index<2>(wx / 2, wy / 2), 40, _NF);
+	SetCircleObstruction(index<2>(wx / 2, wy / 2), 40, _NF, _XY);
 
 	//Frame
 	parallel_for_each(_frame.extent,
 		[=](index<2>idx) restrict(amp) {
-			Cell u = _XY[idx];
+			Cell cl = _XY[idx - 1];
+			Cell cr = _XY[idx + 1];
+			Cell cu = _XY[idx + wx];
+			Cell cd = _XY[idx - wx];
+			Cell c = _XY[idx];
 
-			_frame[idx].SetColor(u.x * 255, 0/*u.rho * 255*/, u.y * 255);
+			//_frame[idx].SetColor(u.x + 1 * 127, 0/*u.rho * 255*/, u.y + 1 * 127);
+
+			//Frame Colour Based On Difference Between Neighbours
+			if (c.isSolid) {
+				_frame[idx].SetColor(255, 255, 255);
+			}
+			else {
+				_frame[idx].SetColor(fabsf(cl.x - cr.x) * 255, 0, fabsf(cu.y - cd.y) * 255);
+			}
+
 
 			/*float f = _NF[idx[0]][idx[1]][0];
 

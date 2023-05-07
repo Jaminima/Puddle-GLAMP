@@ -24,13 +24,13 @@ completion_future* simStep;
 void triggerReDraw()
 {
 	//frame = RenderFrame();
-	//simStep = DoTick();
+	simStep = DoTick();
 
 	framesInSec++;
 
 	if (clock() - fpsTime >= 1000)
 	{
-		simStep = DoTick();
+		//simStep = DoTick();
 		printf_s("You averaged %d fps\n", framesInSec);
 		framesInSec = 0;
 		fpsTime = clock();
