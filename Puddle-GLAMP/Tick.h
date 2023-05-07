@@ -90,7 +90,7 @@ completion_future* DoTick() {
 	const unsigned int wc = world_cells;
 
 	//X, Y
-	array_view<Cell, 2> _XY(wx, wy, world);
+	array_view<Cell, 2> _XY(wy, wx, world);
 
 	//View
 	array_view<Color, 2> _frame(w, h, Frame);
@@ -108,56 +108,56 @@ completion_future* DoTick() {
 		[=](index<3> idx) restrict(amp) {
 			float v = _F[idx];
 
-			index<3> nidx(idx[0], idx[1], idx[2]);
+			index<3> nidx(idx[0], idx[1]+1, idx[2]);
 
 			_NF[nidx] = v;
 		}
 	);
 
-	//Fluid Variables
-	parallel_for_each(_XY.extent,
-		[=](index<2> idx) restrict(amp) {
-			float rho = 0;
-	float ux = 0;
-	float uy = 0;
+	////Fluid Variables
+	//parallel_for_each(_XY.extent,
+	//	[=](index<2> idx) restrict(amp) {
+	//		float rho = 0;
+	//float ux = 0;
+	//float uy = 0;
 
-	for (int i = 0; i < NL; i++) {
-		index<3> _FIdx(idx[0], idx[1], i);
+	//for (int i = 0; i < NL; i++) {
+	//	index<3> _FIdx(idx[0], idx[1], i);
 
-		rho += _NF[_FIdx];
-		ux += _NF[_FIdx] * _cxsy[i];
-		uy += _NF[_FIdx] * _cxsy[i + 8];
-	}
+	//	rho += _NF[_FIdx];
+	//	ux += _NF[_FIdx] * _cxsy[i];
+	//	uy += _NF[_FIdx] * _cxsy[i + 8];
+	//}
 
-	_XY[idx].rho = rho;
-	_XY[idx].x = ux;
-	_XY[idx].y = uy;
+	//_XY[idx].rho = rho;
+	//_XY[idx].x = ux;
+	//_XY[idx].y = uy;
 
-	float sum = ux + uy;
-		}
-	);
+	//float sum = ux + uy;
+	//	}
+	//);
 
-	//Apply Collision
-	parallel_for_each(_Feq.extent,
-		[=](index<3> idx)restrict(amp) {
-			index<2> widx(idx[0], idx[1]);
-	Cell u = _XY[widx];
+	////Apply Collision
+	//parallel_for_each(_Feq.extent,
+	//	[=](index<3> idx)restrict(amp) {
+	//		index<2> widx(idx[0], idx[1]);
+	//Cell u = _XY[widx];
 
-	float v = u.rho * _W[idx[2]];
-	float cx = _cxsy[idx[2]];
-	float cy = _cxsy[idx[2] + NL];
+	//float v = u.rho * _W[idx[2]];
+	//float cx = _cxsy[idx[2]];
+	//float cy = _cxsy[idx[2] + NL];
 
-	float cxuxcyuy = cx * u.x + cy * u.y;
+	//float cxuxcyuy = cx * u.x + cy * u.y;
 
-	float vb = (1 + 3 * cxuxcyuy + 9 * cxuxcyuy * cxuxcyuy / 2 - 3 * (u.x * u.x + u.y * u.y) / 2);
+	//float vb = (1 + 3 * cxuxcyuy + 9 * cxuxcyuy * cxuxcyuy / 2 - 3 * (u.x * u.x + u.y * u.y) / 2);
 
-	v *= vb;
+	//v *= vb;
 
-	_Feq[idx] = v;
+	//_Feq[idx] = v;
 
-	_NF[idx] += -(1.0f / tau) * (_NF[idx] - v);
-		}
-	);
+	//_NF[idx] += -(1.0f / tau) * (_NF[idx] - v);
+	//	}
+	//);
 
 	//SetRectangleObstruction(index<2>(wx / 2 - 20, wy / 2 - 20), index<2>(wx / 2 + 20, wy / 2 + 20), _NF);
 	SetCircleObstruction(index<2>(wx / 2, wy / 2), 40, _NF);
@@ -165,9 +165,13 @@ completion_future* DoTick() {
 	//Frame
 	parallel_for_each(_frame.extent,
 		[=](index<2>idx) restrict(amp) {
-			Cell u = _XY[idx];
+			//Cell u = _XY[idx];
 
-	_frame[idx].SetColor(u.x * 255, u.rho * 255, u.y * 255);
+	//_frame[idx].SetColor(u.x * 255, u.rho * 255, u.y * 255);
+
+			float f = _NF[idx[0]][idx[1]][0];
+
+			_frame[idx].SetColor(f * 255, 0, 0);
 		}
 	);
 
