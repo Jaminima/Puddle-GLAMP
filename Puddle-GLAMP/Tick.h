@@ -9,6 +9,7 @@ unsigned int step = 0;
 //Lattice Speed
 #define NL 9
 #define tau 0.6
+#define rho0 100
 
 float* cxsy, * weights, * F;
 
@@ -23,13 +24,32 @@ void InitTick() {
 
 	srand(time(NULL));
 
-	for (int i = 0; i < F_Dim; i++) {
-		//F[i] = rand() / 10.0f;
-		F[i] = 1 + (rand() % 100) / 1000.0f;
+	//for (int i = 0; i < F_Dim; i++) {
+	//	//F[i] = rand() / 10.0f;
+	//	F[i] = 1 + (rand() % 100) / 1000.0f;
 
-		/*if (i % NL < 3) {
-			F[i] += 2 * (1+0.2 * cosf(2*3.14159*i));
-		}*/
+	//	if (i % NL < 3) {
+	//		F[i] += 2 * (1+0.2 * cosf(2*3.14159*i));
+	//	}
+	//}
+
+	for (int i = 0; i < world_x * world_y; i++) {
+		float rho = 0;
+
+		for (int j = 0; j < NL; j++) {
+			float v = 1 + (rand() % 100) / 1000.0f;
+
+			if (j == 3) {
+				F[i] += 2 * (1+0.2 * cosf(2*3.14159*i));
+			}
+
+			rho += v;
+			F[i * NL + j] = v;
+		}
+
+		for (int j = 0; j < NL; j++) {
+			F[i * NL + j] *= rho0 / rho;
+		}
 	}
 }
 
