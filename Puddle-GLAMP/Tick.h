@@ -167,7 +167,7 @@ completion_future* DoTick() {
 		[=](index<2>idx) restrict(amp) {
 			Cell u = _XY[idx];
 
-			_frame[idx].SetColor(u.x * 255, u.rho * 255, u.y * 255);
+			_frame[idx].SetColor(u.x * 255, 0/*u.rho * 255*/, u.y * 255);
 
 			/*float f = _NF[idx[0]][idx[1]][0];
 
