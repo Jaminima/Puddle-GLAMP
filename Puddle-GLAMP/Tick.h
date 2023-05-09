@@ -145,7 +145,7 @@ void DoTick() {
 
 			float v = _F[srcindex];
 
-			_NF[idx] = v * inRange;
+			_NF[idx] = (v * (int)inRange) + ( _F[idx] * (int)!inRange );
 		}
 	);
 
@@ -214,7 +214,7 @@ void DoTick() {
 			}
 			else {
 				//_frame[idx].SetColor(c.x * 255, c.rho * 255, c.y * 255);
-				_frame[idx].SetColor(fabsf(cl.x - cr.x) * 10000000 * 255, fabsf(c.rho) * 255, fabsf(cu.y - cd.y) * 255);
+				_frame[idx].SetColor(1/fabsf(cl.x - cr.x) * 255, fabsf(c.rho) * 255, fabsf(cu.y - cd.y) * 255);
 			}
 
 
