@@ -24,26 +24,16 @@ completion_future* simStep;
 void triggerReDraw()
 {
 	//frame = RenderFrame();
-	simStep = DoTick();
+	DoTick();
 
 	framesInSec++;
 
 	if (clock() - fpsTime >= 1000)
 	{
-		//simStep = DoTick();
 		printf_s("You averaged %d fps\n", framesInSec);
 		framesInSec = 0;
 		fpsTime = clock();
 	}
-
-	if (simStep != 0x0) {
-		for (int i = 0; i < futures_returned; i++) {
-			simStep[i].wait();
-		}
-	}
-
-	delete[] simStep;
-	simStep = 0x0;
 
 	glutPostRedisplay();
 }

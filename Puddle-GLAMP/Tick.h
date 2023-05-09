@@ -116,9 +116,7 @@ inline bool isInRange(int i, int lim) restrict(amp) {
 	return i < lim && i >= 0;
 }
 
-completion_future* DoTick() {
-	completion_future* fin = new completion_future[futures_returned];
-
+void DoTick() {
 	//NX, NY
 	const unsigned int wx = world_x;
 	const unsigned int wy = world_y;
@@ -141,14 +139,13 @@ completion_future* DoTick() {
 	//Apply Drift
 	parallel_for_each(_NF.extent,
 		[=](index<3> idx) restrict(amp) {
-			float v = _F[idx];
+			index<3> srcindex(idx[0] - _cxsy[idx[2]+NL], idx[1] - _cxsy[idx[2]], idx[2]);
 
-			index<3> nidx(idx[0], idx[1]+1, idx[2]);
+			bool inRange = isInRange(srcindex[0], wy) && isInRange(srcindex[1],wx) && isInRange(srcindex[2], NL);
 
-			bool inRange = isInRange(nidx[0], wy) && isInRange(nidx[1],wx) && isInRange(nidx[2], NL);
+			float v = _F[srcindex];
 
-
-			_NF[nidx] = v * inRange;
+			_NF[idx] = v * inRange;
 		}
 	);
 
@@ -164,7 +161,7 @@ completion_future* DoTick() {
 
 				rho += _NF[_FIdx];
 				ux += _NF[_FIdx] * _cxsy[i];
-				uy += _NF[_FIdx] * _cxsy[i + 8];
+				uy += _NF[_FIdx] * _cxsy[i + NL];
 			}
 
 			_XY[idx].rho = rho;
@@ -216,7 +213,8 @@ completion_future* DoTick() {
 				_frame[idx].SetColor(255, 255, 255);
 			}
 			else {
-				_frame[idx].SetColor(fabsf(cl.x - cr.x) * 255, 0, fabsf(cu.y - cd.y) * 255);
+				//_frame[idx].SetColor(c.x * 255, c.rho * 255, c.y * 255);
+				_frame[idx].SetColor(fabsf(cl.x - cr.x) * 10000000 * 255, fabsf(c.rho) * 255, fabsf(cu.y - cd.y) * 255);
 			}
 
 
@@ -228,11 +226,9 @@ completion_future* DoTick() {
 
 	step++;
 
-	fin[0] = _NF.synchronize_async(access_type_read_write);
+	_NF.synchronize(access_type_read_write);
 
-	fin[1] = _XY.synchronize_async(access_type_read_write);
+	 _XY.synchronize(access_type_read_write);
 
-	fin[2] = _frame.synchronize_async(access_type_read_write);
-
-	return fin;
+	_frame.synchronize(access_type_read_write);
 }
