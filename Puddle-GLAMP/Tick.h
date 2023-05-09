@@ -143,9 +143,13 @@ void DoTick() {
 
 			bool inRange = isInRange(srcindex[0], wy) && isInRange(srcindex[1],wx) && isInRange(srcindex[2], NL);
 
-			float v = _F[srcindex];
-
-			_NF[idx] = (v * (int)inRange) + ( _F[idx] * (int)!inRange );
+			if (inRange) {
+				float v = _F[srcindex];
+				_NF[idx] = v;
+			}
+			else {
+				_NF[idx] = _F[idx];
+			}
 		}
 	);
 
