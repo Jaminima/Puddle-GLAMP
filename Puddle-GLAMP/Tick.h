@@ -110,6 +110,12 @@ void SetCircleObstruction(index<2> center, unsigned int r, array_view<float, 3> 
 
 #define futures_returned 3
 
+
+
+inline bool isInRange(int i, int lim) restrict(amp) {
+	return i < lim && i >= 0;
+}
+
 completion_future* DoTick() {
 	completion_future* fin = new completion_future[futures_returned];
 
@@ -139,7 +145,10 @@ completion_future* DoTick() {
 
 			index<3> nidx(idx[0], idx[1]+1, idx[2]);
 
-			_NF[nidx] = v;
+			bool inRange = isInRange(nidx[0], wy) && isInRange(nidx[1],wx) && isInRange(nidx[2], NL);
+
+
+			_NF[nidx] = v * inRange;
 		}
 	);
 
