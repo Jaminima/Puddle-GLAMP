@@ -8,7 +8,7 @@ unsigned int step = 0;
 
 //Lattice Speed
 #define NL 9
-#define tau 0.6
+#define tau 0.6f
 #define rho0 100
 
 #define scaledrndres 10000
