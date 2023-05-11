@@ -134,6 +134,7 @@ void DoTick() {
 	array_view<float, 3> _F(wx, wy, NL, F);
 	array_view<float, 3> _NF(wx, wy, NL, F);
 
+	//Temp
 	array_view<float, 3> _Feq(wx, wy, NL);
 
 	//Apply Drift
@@ -200,6 +201,7 @@ void DoTick() {
 
 	//SetRectangleObstruction(index<2>(wx / 2 - 20, wy / 2 - 20), index<2>(wx / 2 + 20, wy / 2 + 20), _NF);
 	SetCircleObstruction(index<2>(wx / 2, wy / 2), 40, _NF, _XY);
+	
 
 	//Frame
 	parallel_for_each(_frame.extent,
@@ -210,6 +212,12 @@ void DoTick() {
 			Cell cd = _XY[idx - wx];
 			Cell c = _XY[idx];
 
+			Cell avg;
+
+			avg.x = fabsf((cl.x + cr.x + cu.x + cd.x + c.x) / 5);
+			avg.y = fabsf((cl.y + cr.y + cu.y + cd.y + c.y) / 5);
+			avg.rho = fabsf((cl.rho + cr.rho + cu.rho + cd.rho + c.rho) / 5);
+
 			//_frame[idx].SetColor(u.x + 1 * 127, 0/*u.rho * 255*/, u.y + 1 * 127);
 
 			//Frame Colour Based On Difference Between Neighbours
@@ -218,7 +226,7 @@ void DoTick() {
 			}
 			else {
 				//_frame[idx].SetColor(c.x * 255, c.rho * 255, c.y * 255);
-				_frame[idx].SetColor(1/fabsf(cl.x - cr.x) * 255, fabsf(c.rho) * 255, fabsf(cu.y - cd.y) * 255);
+				_frame[idx].SetColor(fabsf(cl.x - cr.x)/avg.x*127, 0, 0);
 			}
 
 
