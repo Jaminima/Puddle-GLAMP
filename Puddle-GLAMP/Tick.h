@@ -131,8 +131,8 @@ void DoTick() {
 	//Shared
 	array_view<float, 1> _cxsy(18, cxsy);
 	array_view<float, 1> _W(9, weights);
-	array_view<float, 3> _F(wx, wy, NL, F);
-	array_view<float, 3> _NF(wx, wy, NL, F);
+	array_view<float, 3> _F(wy, wx, NL, F);
+	array_view<float, 3> _NF(wy, wx, NL, F);
 
 	//Temp
 	array_view<float, 3> _Feq(wx, wy, NL);
@@ -144,13 +144,20 @@ void DoTick() {
 
 			bool inRange = isInRange(srcindex[0], wy) && isInRange(srcindex[1],wx) && isInRange(srcindex[2], NL);
 
+			float v;
+
 			if (inRange) {
-				float v = _F[srcindex];
-				_NF[idx] = v;
+				v = _F[srcindex];
 			}
 			else {
-				_NF[idx] = _F[idx];
+				v = _F[idx];
 			}
+
+			if (v != v) {
+				v = _F[idx];
+			}
+
+			_NF[idx] = v;
 		}
 	);
 
@@ -167,6 +174,10 @@ void DoTick() {
 				rho += _NF[_FIdx];
 				ux += _NF[_FIdx] * _cxsy[i];
 				uy += _NF[_FIdx] * _cxsy[i + NL];
+			}
+
+			if (rho != rho) {
+				rho = -1;
 			}
 
 			_XY[idx].rho = rho;
@@ -212,11 +223,16 @@ void DoTick() {
 			Cell cd = _XY[idx - wx];
 			Cell c = _XY[idx];
 
-			Cell avg;
+			Cell max, min;
 
-			avg.x = fabsf((cl.x + cr.x + cu.x + cd.x + c.x) / 5);
-			avg.y = fabsf((cl.y + cr.y + cu.y + cd.y + c.y) / 5);
-			avg.rho = fabsf((cl.rho + cr.rho + cu.rho + cd.rho + c.rho) / 5);
+			max.x = max(cl.x, max(cr.x, max(cu.x, max(cd.x, c.x))));
+			min.x = min(cl.x, min(cr.x, min(cu.x, min(cd.x, c.x))));
+
+			max.y = max(cl.y, max(cr.y, max(cu.y, max(cd.y, c.x))));
+			min.y = min(cl.y, min(cr.y, min(cu.y, min(cd.y, c.x))));
+
+			max.rho = max(cl.rho, max(cr.rho, max(cu.rho, max(cd.rho, c.x))));
+			min.rho = min(cl.rho, min(cr.rho, min(cu.rho, min(cd.rho, c.x))));
 
 			//_frame[idx].SetColor(u.x + 1 * 127, 0/*u.rho * 255*/, u.y + 1 * 127);
 
@@ -226,7 +242,10 @@ void DoTick() {
 			}
 			else {
 				//_frame[idx].SetColor(c.x * 255, c.rho * 255, c.y * 255);
-				_frame[idx].SetColor(fabsf(cl.x - cr.x)/avg.x*127, 0, 0);
+				_frame[idx].SetColor(
+					fabsf((c.x - min.x) / (max.x - min.x)) * 255,
+					fabsf((c.y - min.y) / (max.y - min.y)) * 255,
+					fabsf((c.rho - min.rho) / (max.rho - min.rho)) * 255);
 			}
 
 
