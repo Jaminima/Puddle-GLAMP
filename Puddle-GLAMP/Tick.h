@@ -140,7 +140,7 @@ void DoTick() {
 	//Apply Drift
 	parallel_for_each(_NF.extent,
 		[=](index<3> idx) restrict(amp) {
-			index<3> srcindex(idx[0] - _cxsy[idx[2]+NL], idx[1] - _cxsy[idx[2]], idx[2]);
+			index<3> srcindex(idx[0] + _cxsy[idx[2]+NL], idx[1] + _cxsy[idx[2]], idx[2]);
 
 			bool inRange = isInRange(srcindex[0], wy) && isInRange(srcindex[1],wx) && isInRange(srcindex[2], NL);
 

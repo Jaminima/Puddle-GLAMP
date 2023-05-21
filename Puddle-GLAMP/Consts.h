@@ -3,7 +3,7 @@
 //#define EnableReducedTracing
 
 #ifndef __Consts
-const unsigned int w = 512, h = 512;
+const unsigned int w = 1024, h = 1024;
 
 const unsigned int w_half = w / 2, h_half = h / 2;
 
