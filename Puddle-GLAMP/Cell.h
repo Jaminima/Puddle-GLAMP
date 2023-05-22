@@ -1,5 +1,13 @@
 #pragma once
 
 class Cell {
-	float f = 1;
+public:
+	float x = 0;
+	float y = 0;
+	float rho = 1;
+
+	bool isSolid = false;
+
+	Cell() restrict(amp, cpu) {
+	}
 };

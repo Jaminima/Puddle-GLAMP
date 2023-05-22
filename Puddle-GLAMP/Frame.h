@@ -3,13 +3,11 @@
 #include "Color.h"
 #include "Camera.h"
 #include "Consts.h"
-#include "Lock.h"
 
 #include <iostream>
 
 Camera* camera;
 Color* Frame;
-Lock* frameLock = new Lock[w * h];
 
 template <typename T> int sgn(T val) restrict(amp, cpu) {
 	return (T(0) < val) - (val < T(0));

@@ -19,12 +19,12 @@ void drawFrame()
 	glutSwapBuffers();
 }
 
-completion_future simStep;
+completion_future* simStep;
 
 void triggerReDraw()
 {
 	//frame = RenderFrame();
-	simStep = DoTick();
+	DoTick();
 
 	framesInSec++;
 
@@ -34,8 +34,6 @@ void triggerReDraw()
 		framesInSec = 0;
 		fpsTime = clock();
 	}
-
-	simStep.wait();
 
 	glutPostRedisplay();
 }
