@@ -59,9 +59,6 @@
     <ClInclude Include="Color.h">
       <Filter>Header Files\Render</Filter>
     </ClInclude>
-    <ClInclude Include="Consts.h">
-      <Filter>Header Files\Render</Filter>
-    </ClInclude>
     <ClInclude Include="Frame.h">
       <Filter>Header Files\Render</Filter>
     </ClInclude>
@@ -79,6 +76,9 @@
     </ClInclude>
     <ClInclude Include="World.h">
       <Filter>Header Files\Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="Consts.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

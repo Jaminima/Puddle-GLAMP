@@ -153,10 +153,6 @@ void DoTick() {
 				v = _F[idx];
 			}
 
-			if (v != v) {
-				v = _F[idx];
-			}
-
 			_NF[idx] = v;
 		}
 	);
@@ -212,7 +208,6 @@ void DoTick() {
 
 	//SetRectangleObstruction(index<2>(wx / 2 - 20, wy / 2 - 20), index<2>(wx / 2 + 20, wy / 2 + 20), _NF);
 	SetCircleObstruction(index<2>(wx / 2, wy / 2), 40, _NF, _XY);
-	
 
 	//Frame
 	parallel_for_each(_frame.extent,
